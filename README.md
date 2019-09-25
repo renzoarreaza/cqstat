@@ -5,8 +5,12 @@ and expended from there for this new purpose.
 
 This is my first C project, the quality of the code is therefore not great. Feel free to contact me if you find a bug.
 
+## To Do: </br>
+Come up with design!
 
 
+
+# original readme from above mentioned repository
 # qdisc_stats
 Uses netlink to fetch queueing discipline stats from kernel. A large part of the code has been inspired from iproute2 userspace utility.
 
