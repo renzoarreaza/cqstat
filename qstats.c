@@ -1,13 +1,10 @@
 /*
- * qstats.c 
- * Uses netlink to fetch qdisc stats from kernel.
- * 
- * Author: Shubham Tiwari <f2016935@pilani.bits-pilani.ac.in>
  */ 
 
 #include <linux/rtnetlink.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <net/if.h>
 
 #include "nlcomm.h"
 #include <time.h>
@@ -16,11 +13,18 @@
 
 int main(int argc, char *argv[]) {
 
-	char r_type;
+	char r_type; // 'c' or 'q' (class or queue) statistics
 	// parsing arguments
+
+	char ints[argc/2][IFNAMSIZ];	// list containing interface names passed as arguments
+	int ints_index = 0;
 	while (argc > 0) {
 		if (strcmp(*argv, "dev") == 0) {
-//			NEXT_ARG();
+			argc--; argv++;
+			printf("dev: %s", *argv);
+//			ints[ints_index] = *argv;
+			strcpy(ints[ints_index], *argv);
+			ints_index++;
 			// TO DO: set add to list of interfaces
 		} else if(strcmp(*argv, "-c") == 0) {
 			r_type = 'c';
