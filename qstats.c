@@ -11,8 +11,26 @@
 
 #include "nlcomm.h"
 #include <time.h>
+#include <string.h>
+
 
 int main(int argc, char *argv[]) {
+
+	char r_type;
+	// parsing arguments
+	while (argc > 0) {
+		if (strcmp(*argv, "dev") == 0) {
+//			NEXT_ARG();
+			// TO DO: set add to list of interfaces
+		} else if(strcmp(*argv, "-c") == 0) {
+			r_type = 'c';
+		} else if(strcmp(*argv, "-q") == 0) {
+			r_type = 'q';
+		}
+		argc--; argv++;
+	}
+	if (!r_type)
+		r_type = 'c';
 
 	clock_t start_t, end_t; 
 	start_t = clock(); 
@@ -21,7 +39,7 @@ int main(int argc, char *argv[]) {
 	/* Open a netlink socket */ 
 	int sock_fd = nl_sock();
 	/* Using nl_print_qdisc_stats as the callback function to parse netlink message */
-	nl_dump_class_qdisc_request(sock_fd, nl_print_qdisc_stats_new, 'c');
+	nl_dump_class_qdisc_request(sock_fd, nl_print_qdisc_stats_new, r_type);
 
 	/* Close netlink socket */ 
 	close(sock_fd);
@@ -33,3 +51,4 @@ int main(int argc, char *argv[]) {
 
 	printf("\n");
 }  
+
