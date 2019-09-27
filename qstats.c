@@ -21,8 +21,6 @@ int main(int argc, char *argv[]) {
 	while (argc > 0) {
 		if (strcmp(*argv, "dev") == 0) {
 			argc--; argv++;
-			printf("dev: %s", *argv);
-//			ints[ints_index] = *argv;
 			strcpy(ints[ints_index], *argv);
 			ints_index++;
 			// TO DO: set add to list of interfaces
