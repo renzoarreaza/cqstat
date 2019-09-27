@@ -19,14 +19,14 @@ sudo apt update
 sudo apt install linux-headers-$(uname -r)
 ```
 
-### Compile
+## Compile
 Execute the following command in the terminal in the path containing nlcomm.c:
 
 ```gcc nlcomm.c qstats.c -o qdisc_stats```
 
 This should generate a binary file named qdisc_stats in the current working directory.
 
-### Execute
+## Execute
 Execute the following command in the terminal in the path containing nlcomm.c:
 
 ```./qdisc_stats```
