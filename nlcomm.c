@@ -544,13 +544,16 @@ void nl_print_qdisc_stats_new(char *buf, int recvlen) {
 		else
 			printf(" parent %x:%x ", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
 
-
 		if (strcmp("pfifo_fast", RTA_DATA(tb[TCA_KIND])) == 0) {
 			/* get prio qdisc kind */
 
 		} else {
 			/* get tb[TCA_KIND] qdsic kind */
 		}
+
+		if (tcrecv->tcm_info) // leaf info only for classes, returns 0 for queues. 
+			printf(" leaf %x: ", tcrecv->tcm_info>>16);
+
 
 		/* Print queue stats */
 		struct rtattr *tbs[TCA_STATS_MAX + 1];
