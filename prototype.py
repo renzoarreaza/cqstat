@@ -38,12 +38,32 @@ for i in items:
 interfaces = list(set(interfaces))
 print(interfaces)
 
+
 #for each interface
 for inter in interfaces:
 	#find root qdisc	
-	pass
+	for item in items:
+		if item.cq == "qdisc" and item.maj_p is None and item.min_p is None:
+			edge = "+" +"-"*(4+len(item.type))+"+"  
+			print(edge)	
+			print("|  "+str(item.type)+"  |")
+			print(edge+"\n")	
+			break
 
-
+	#find root class(es)
+	line1 = ""
+	line2 = ""
+	line3 = ""
+	for item in items:
+		#if item.cq == "class" and item.maj_p == 1 and item.min_p is None: #test
+		if item.cq == "class" and item.maj_p is None and item.min_p is None:
+			edge = "+" +"-"*(4+len(item.type))+"+"  
+			line1 += edge + "\t" 
+			line2 += "|  "+str(item.type)+"  |"+"\t"
+			line3 += edge + "\t" 
+	print(line1)
+	print(line2)
+	print(line3+"\n")
 
 exit(0)
 
