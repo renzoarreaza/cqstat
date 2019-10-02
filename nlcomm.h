@@ -10,8 +10,9 @@
 int nl_sock();
 int nl_dump_qdisc_request(int sock_fd, void (*cb)(char *, int));
 int nl_dump_class_request(int sock_fd, void (*cb)(char *, int));
-int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int), char r_type);
+//int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int), char r_type);
+int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int, char **, int), char r_type, char **ints, int ints_index);
 void nl_print_qdisc_stats(char *buf, int recvlen);
-void nl_print_qdisc_stats_new(char *buf, int recvlen);
+void nl_print_qdisc_stats_new(char *buf, int recvlen, char **ints, int ints_index);
 void nl_print_qdisc_stats_start(char *buf, int recvlen);
 void nl_parse_attr(struct rtattr *rta, int len, struct rtattr *tb[], int max);

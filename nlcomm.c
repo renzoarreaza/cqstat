@@ -19,6 +19,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "nlcomm.h"
+#include <stdbool.h>
+
 
    /* +----------+
 	* | nlmsghdr |
@@ -108,7 +110,12 @@ int nl_sock() {
 
 static int filter_ifindex;
 
-int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int), char r_type) {
+int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int, char **, int), char r_type, char **ints, int ints_index) {
+	int i;
+    for (i=0; i<ints_index; i++) {
+		printf("request funtion:\n");
+        printf("dev %d: %s\n", i, ints[i]);
+    }
 	struct tcmsg t = { .tcm_family = AF_UNSPEC };
 	char d[IFNAMSIZ] = {};
 //	strncpy(d, "enp6s0", sizeof(d)-1);
@@ -247,7 +254,7 @@ int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int), char r_typ
 	printf("\nRecieved msg len: %d", recvlen);
 	printf("\nRecieved message payload: %s", (char *)buf);
 
-	(*cb)(buf, recvlen);
+	(*cb)(buf, recvlen, ints, ints_index);
 }
 
 void nl_parse_attr(struct rtattr *rta, int len, struct rtattr *tb[], int max) {
@@ -448,7 +455,25 @@ void nl_print_qdisc_stats(char *buf, int recvlen) {
 }
 
 
-void nl_print_qdisc_stats_new(char *buf, int recvlen) {
+void nl_print_qdisc_stats_new(char *buf, int recvlen, char **ints, int ints_index) {
+	
+	int i;
+	i = 0;
+	printf("\nnew stats function:\n");
+    for (i=0; i<ints_index; i++) {
+        printf("dev %d: %s\n", i, ints[i]);
+    }
+
+
+	i = 0;
+	printf("\nSelected interfaces: ");
+    for (i=0; i<ints_index; i++) {
+		if (i==0)
+			printf("%s", ints[i]);
+		if (i!=0)
+			printf(", %s", ints[i]);
+    }
+
 
 	struct nlmsghdr *h = (struct nlmsghdr *)buf;
 	int msglen = recvlen;
@@ -496,10 +521,29 @@ void nl_print_qdisc_stats_new(char *buf, int recvlen) {
 		nl_parse_attr(rta, len, tb, TCA_MAX);
 
 		//ignore superfluous information 
-		if (filter_ifindex && filter_ifindex != tcrecv->tcm_ifindex) {
-			h = NLMSG_NEXT(h, msglen);
-			continue;
+//		if (filter_ifindex && filter_ifindex != tcrecv->tcm_ifindex) {
+//			h = NLMSG_NEXT(h, msglen);
+//			continue;
+//		}
+
+		{
+			char e[IFNAMSIZ] = {};
+			if_indextoname(tcrecv->tcm_ifindex, e);
+			int i;
+			bool selected = false;
+			for (i=0; i<ints_index; i++) {
+				if (!strcmp(ints[i], e)) {	
+					selected = true;
+				}
+			}
+			if (!selected) {
+				h = NLMSG_NEXT(h, msglen);
+				continue;
+			}
 		}
+
+
+
 		printf ("\n -------------- \n");
 		printf("saved index: %d \nreceived index: %d \n", filter_ifindex, tcrecv->tcm_ifindex);
 		
