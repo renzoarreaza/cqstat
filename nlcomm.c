@@ -76,6 +76,18 @@
 	* multiple attributes in the same netlink message.
 	*/
 
+
+#include <sys/time.h>
+
+//Returns the current time with microsecond accuracy
+double getMicrotime(){
+	struct timeval currentTime;
+	gettimeofday(&currentTime, NULL);
+	return currentTime.tv_sec  + currentTime.tv_usec* (double)1e-6;
+}
+//	double time = getMicrotime();
+//	printf("%f\n", time);
+
 int nl_sock() {
 	int sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
 	if (sock_fd < 0) {
@@ -408,9 +420,10 @@ void nl_print_qdisc_stats(char *buf, int recvlen) {
 
 void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
 
+	double time = getMicrotime();
+//	printf("%f\n", time);
 	
 	/* Read message from the kernel */
-
 	struct sockaddr_nl nladdr;
 	struct iovec iovrecv;
 	iovrecv.iov_base = NULL;
@@ -550,6 +563,9 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
 		}
 
 		/* convert to string -> (const char *)RTA_DATA(rta); */
+		/* Print dev name using if_indextoname */
+		char d[IFNAMSIZ] = {};
+		printf("dev %s", if_indextoname(tcrecv->tcm_ifindex, d));
 
 		printf("\n qdisc %s", (const char *)RTA_DATA(tb[TCA_KIND]));
 		//handle
@@ -566,11 +582,8 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
 			printf(" handle %x:%x ", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
 
 //		printf("[%08x]", tcrecv->tcm_handle);
+	
 
-
-		/* Print dev name using if_indextoname */
-		char d[IFNAMSIZ] = {};
-		printf("dev %s", if_indextoname(tcrecv->tcm_ifindex, d));
 
 		//parent
 		__u32 parent = tcrecv->tcm_parent;
@@ -644,8 +657,8 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
 			};
 		*/
 
+		struct gnet_stats_basic bs = {0};
 		if (tbs[TCA_STATS_BASIC]) {
-			struct gnet_stats_basic bs = {0};
 
 			memcpy(&bs, RTA_DATA(tbs[TCA_STATS_BASIC]), MIN(RTA_PAYLOAD(tbs[TCA_STATS_BASIC]), sizeof(bs)));
 			printf("bytes: %llu packets %u", bs.bytes, bs.packets);
@@ -660,6 +673,34 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
 
 			printf(" qlen: %d drops: %d", q.qlen, q.drops);
 		}
+// DATA to be save to file
+/*
+		printf("\n------------------------------\n");	
+		if (handle == TC_H_ROOT)
+			printf(" root ");
+		else if (handle == TC_H_UNSPEC)
+			printf(" handle none ");
+		else if (TC_H_MAJ(handle) == 0)
+			printf(" handle :%x ", TC_H_MIN(handle));
+		else if (TC_H_MIN(handle) == 0)
+			printf(" handle %x: ", TC_H_MAJ(handle) >> 16);
+		else
+			printf(" handle %x:%x ", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
+		if (parent == TC_H_ROOT)
+			printf(" root ");
+		else if (parent == TC_H_UNSPEC)
+			printf(" parent none ");
+		else if (TC_H_MAJ(parent) == 0)
+			printf(" parent :%x ", TC_H_MIN(parent));
+		else if (TC_H_MIN(parent) == 0)
+			printf(" parent %x: ", TC_H_MAJ(parent) >> 16);
+		else
+			printf(" parent %x:%x ", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
+		printf("bytes: %llu packets %u", bs.bytes, bs.packets);
+		printf("%f", time);
+		printf("\n qdisc %s", (const char *)RTA_DATA(tb[TCA_KIND]));
+		printf("\n------------------------------\n");	
+*/
 
 		h = NLMSG_NEXT(h, msglen);
 	}

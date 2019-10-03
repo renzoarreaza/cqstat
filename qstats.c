@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 void usage(void) {
 	printf("Options:\n\n\
 \t-c,\t\tGet stats per Class\n\
@@ -18,7 +19,6 @@ void usage(void) {
 
 
 int main(int argc, char *argv[]) {
-
 	// parsing arguments
 	char r_type; // 'c' or 'q' (class or queue) statistics
 //	char ints[argc/2][IFNAMSIZ];	// list containing interface names passed as arguments
