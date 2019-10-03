@@ -110,12 +110,8 @@ int nl_sock() {
 
 static int filter_ifindex;
 
-int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int, char **, int), char r_type, char **ints, int ints_index) {
-	int i;
-    for (i=0; i<ints_index; i++) {
-		printf("request funtion:\n");
-        printf("dev %d: %s\n", i, ints[i]);
-    }
+int nl_dump_class_qdisc_request(int sock_fd, char r_type) {
+
 	struct tcmsg t = { .tcm_family = AF_UNSPEC };
 	char d[IFNAMSIZ] = {};
 //	strncpy(d, "enp6s0", sizeof(d)-1);
@@ -210,51 +206,6 @@ int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int, char **, in
 	sendmsg(sock_fd, &msg, 0);
 	printf("\nWaiting for message from the kernel!");
 
-	/* Read message from the kernel */
-
-	struct sockaddr_nl nladdr;
-	struct iovec iovrecv;
-	iovrecv.iov_base = NULL;
-	iovrecv.iov_len = 0;
-
-
-	struct msghdr msg_recv = {
-		.msg_name = &nladdr,
-		.msg_namelen = sizeof(nladdr),
-		.msg_iov = &iovrecv,
-		.msg_iovlen = 1,
-	};
-
-	char *buf;
-
-	/* Determine buffer length for recieving the message */
-
-	int recvlen = recvmsg(sock_fd, &msg_recv, MSG_PEEK | MSG_TRUNC);
-	if (recvlen < 32768)
-		recvlen = 32768;
-
-	/* Allocate buffer for recieving the message */
-	buf = malloc(recvlen);
-
-	/* Reset the I/O vector */
-	iovrecv.iov_base = buf;
-	iovrecv.iov_len = recvlen;
-
-	/* Now recieve the message */
-	recvlen = recvmsg(sock_fd, &msg_recv, 0);
-
-	if (recvlen <0) {
-		free(buf);
-		printf("\n Error during netlink msg recv: len < 0");
-		return -1;
-	}
-
-	/* At this point of time, buf contains the message */
-
-	printf("\nRecieved msg len: %d", recvlen);
-	printf("\nRecieved message payload: %s", (char *)buf);
-
-	(*cb)(buf, recvlen, ints, ints_index);
 }
 
 void nl_parse_attr(struct rtattr *rta, int len, struct rtattr *tb[], int max) {
@@ -455,7 +406,53 @@ void nl_print_qdisc_stats(char *buf, int recvlen) {
 }
 
 
-void nl_print_qdisc_stats_new(char *buf, int recvlen, char **ints, int ints_index) {
+void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
+
+	
+	/* Read message from the kernel */
+
+	struct sockaddr_nl nladdr;
+	struct iovec iovrecv;
+	iovrecv.iov_base = NULL;
+	iovrecv.iov_len = 0;
+
+
+	struct msghdr msg_recv = {
+		.msg_name = &nladdr,
+		.msg_namelen = sizeof(nladdr),
+		.msg_iov = &iovrecv,
+		.msg_iovlen = 1,
+	};
+
+	char *buf;
+
+	/* Determine buffer length for recieving the message */
+
+	int recvlen = recvmsg(sock_fd, &msg_recv, MSG_PEEK | MSG_TRUNC);
+	if (recvlen < 32768)
+		recvlen = 32768;
+
+	/* Allocate buffer for recieving the message */
+	buf = malloc(recvlen);
+
+	/* Reset the I/O vector */
+	iovrecv.iov_base = buf;
+	iovrecv.iov_len = recvlen;
+
+	/* Now recieve the message */
+	recvlen = recvmsg(sock_fd, &msg_recv, 0);
+
+	if (recvlen <0) {
+		free(buf);
+		printf("\n Error during netlink msg recv: len < 0");
+		exit(1);
+	}
+
+	/* At this point of time, buf contains the message */
+
+	printf("\nRecieved msg len: %d", recvlen);
+	printf("\nRecieved message payload: %s", (char *)buf);
+
 	
 	int i;
 	i = 0;

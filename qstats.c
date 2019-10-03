@@ -61,7 +61,8 @@ int main(int argc, char *argv[]) {
 	/* Open a netlink socket */ 
 	int sock_fd = nl_sock();
 	/* Using nl_print_qdisc_stats as the callback function to parse netlink message */
-	nl_dump_class_qdisc_request(sock_fd, nl_print_qdisc_stats_new, r_type, ints, ints_index);
+	nl_dump_class_qdisc_request(sock_fd, r_type);
+	nl_print_qdisc_stats_new(sock_fd, ints, ints_index); 
 
 	/* Close netlink socket */ 
 	close(sock_fd);
