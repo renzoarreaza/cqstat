@@ -13,6 +13,6 @@ int nl_dump_class_request(int sock_fd, void (*cb)(char *, int));
 //int nl_dump_class_qdisc_request(int sock_fd, void (*cb)(char *, int), char r_type);
 int nl_dump_class_qdisc_request(int sock_fd, char r_type);
 void nl_print_qdisc_stats(char *buf, int recvlen);
-void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** dataFile);
+void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* file_name, FILE *dataFile);
 void nl_print_qdisc_stats_start(char *buf, int recvlen);
 void nl_parse_attr(struct rtattr *rta, int len, struct rtattr *tb[], int max);

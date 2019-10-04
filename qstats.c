@@ -7,6 +7,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 void usage(void) {
@@ -58,16 +59,23 @@ int main(int argc, char *argv[]) {
 
 	FILE *fp;
 	fp = fopen(file_name, "w+");
+	fprintf(fp, "time, dev, qdisc, handle, parent, bytes, packets, qlen, drops");
 //   fprintf(fp, "This is testing for fprintf...\n");
 //   fputs("This is testing for fputs...\n", fp);
 
+//	fprintf(fp, "wrtting from qstats.c, part 1 without\\n");
+//	fprintf(fp, "wrtting from qstats.c, part 2\n");
 // Main part
 	/* Open a netlink socket */ 
-	int sock_fd = nl_sock();
-	nl_dump_class_qdisc_request(sock_fd, r_type);
-	nl_print_qdisc_stats_new(sock_fd, ints, ints_index, &fp); 
+	
+	while(1) {
+		int sock_fd = nl_sock();
+		nl_dump_class_qdisc_request(sock_fd, r_type);
+		nl_print_qdisc_stats_new(sock_fd, ints, ints_index, file_name, fp); 
+		close(sock_fd);
+		usleep(5000); //5 miliseconds
+	}
 	/* Close netlink socket */ 
-	close(sock_fd);
 	// Close file
 	fclose(fp);
 // end Main part 

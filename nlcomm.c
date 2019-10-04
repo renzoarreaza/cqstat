@@ -125,6 +125,7 @@ static int filter_ifindex;
 int nl_dump_class_qdisc_request(int sock_fd, char r_type) {
 
 	struct tcmsg t = { .tcm_family = AF_UNSPEC };
+/*
 	char d[IFNAMSIZ] = {};
 //	strncpy(d, "enp6s0", sizeof(d)-1);
 	strncpy(d, "veth1", sizeof(d)-1);
@@ -132,11 +133,8 @@ int nl_dump_class_qdisc_request(int sock_fd, char r_type) {
 	if (d[0]) {
 		t.tcm_ifindex = if_nametoindex(d);
 		filter_ifindex = t.tcm_ifindex;
-
-//		printf("print test");
-//		printf("index: %d", if_nametoindex(d));
 	}
-
+*/
 	/* rtnl_dump_request(&rth, RTM_GETQDISC, &t, sizeof(t)) < 0) */
 	void *req = (void *)&t;
 	int type;
@@ -216,7 +214,7 @@ int nl_dump_class_qdisc_request(int sock_fd, char r_type) {
 
 	/* message has been framed, now send the message out */ 
 	sendmsg(sock_fd, &msg, 0);
-	printf("\nWaiting for message from the kernel!");
+//	printf("\nWaiting for message from the kernel!");
 
 }
 
@@ -418,7 +416,10 @@ void nl_print_qdisc_stats(char *buf, int recvlen) {
 }
 
 
-void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** dataFile) {
+void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* file_name, FILE *dataFile) {
+	
+//	Writting to file
+//	fprintf(dataFile, "writting from nlcomm.c\n");
 
 	double time = getMicrotime();
 //	printf("%f\n", time);
@@ -463,18 +464,18 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 
 	/* At this point of time, buf contains the message */
 
-	printf("\nRecieved msg len: %d", recvlen);
-	printf("\nRecieved message payload: %s", (char *)buf);
+//	printf("\nRecieved msg len: %d", recvlen);
+//	printf("\nRecieved message payload: %s", (char *)buf);
 
-	
+/*	
 	int i;
 	i = 0;
 	printf("\nnew stats function:\n");
     for (i=0; i<ints_index; i++) {
         printf("dev %d: %s\n", i, ints[i]);
     }
-
-
+*/
+/*
 	i = 0;
 	printf("\nSelected interfaces: ");
     for (i=0; i<ints_index; i++) {
@@ -483,12 +484,12 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 		if (i!=0)
 			printf(", %s", ints[i]);
     }
-
+*/
 
 	struct nlmsghdr *h = (struct nlmsghdr *)buf;
 	int msglen = recvlen;
 
-	printf("\nnlmsg_type: %d", h->nlmsg_type);
+//	printf("\nnlmsg_type: %d", h->nlmsg_type);
 
 	struct tcmsg *tcrecv = NLMSG_DATA(h);
 
@@ -496,7 +497,7 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 	while (NLMSG_OK(h, msglen)) {
 
 		if (h->nlmsg_type == NLMSG_DONE) {
-			printf("\nDone iterating through the netlink message");
+//			printf("\nDone iterating through the netlink message");
 			break;
 		}
 
@@ -554,32 +555,48 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 
 
 
-		printf ("\n -------------- \n");
-		printf("saved index: %d \nreceived index: %d \n", filter_ifindex, tcrecv->tcm_ifindex);
+//		printf ("\n -------------- \n");
+//		printf("saved index: %d \nreceived index: %d \n", filter_ifindex, tcrecv->tcm_ifindex);
 		
 		if (tb[TCA_KIND] == NULL) {
 			printf("\nNULL KIND!");
 			exit(0);
 		}
 
+		// Start writting info to file
+
+		fprintf(dataFile, "\n%f", time);
+		
 		/* convert to string -> (const char *)RTA_DATA(rta); */
 		/* Print dev name using if_indextoname */
 		char d[IFNAMSIZ] = {};
-		printf("dev %s", if_indextoname(tcrecv->tcm_ifindex, d));
+//		printf("dev %s", if_indextoname(tcrecv->tcm_ifindex, d));
+		fprintf(dataFile, ", %s", if_indextoname(tcrecv->tcm_ifindex, d));
 
-		printf("\n qdisc %s", (const char *)RTA_DATA(tb[TCA_KIND]));
+//		printf("\n qdisc %s", (const char *)RTA_DATA(tb[TCA_KIND]));
+		fprintf(dataFile, ", %s", (const char *)RTA_DATA(tb[TCA_KIND]));
 		//handle
 		__u32 handle = tcrecv->tcm_handle;
-		if (handle == TC_H_ROOT)
-			printf(" root ");
-		else if (handle == TC_H_UNSPEC)
-			printf(" handle none ");
-		else if (TC_H_MAJ(handle) == 0)
-			printf(" handle :%x ", TC_H_MIN(handle));
-		else if (TC_H_MIN(handle) == 0)
-			printf(" handle %x: ", TC_H_MAJ(handle) >> 16);
-		else
-			printf(" handle %x:%x ", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
+		if (handle == TC_H_ROOT) {
+//			printf(" root ");
+			fprintf(dataFile, ", root");
+		}
+		else if (handle == TC_H_UNSPEC) {
+//			printf(" handle none ");
+			fprintf(dataFile, ", none");
+		}
+		else if (TC_H_MAJ(handle) == 0) {
+//			printf(" handle :%x ", TC_H_MIN(handle));
+			fprintf(dataFile, ", :%x", TC_H_MIN(handle));
+		}
+		else if (TC_H_MIN(handle) == 0) {
+//			printf(" handle %x: ", TC_H_MAJ(handle) >> 16);
+			fprintf(dataFile, ", %x:", TC_H_MAJ(handle) >> 16);
+		}
+		else {
+//			printf(" handle %x:%x ", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
+			fprintf(dataFile, ", %x:%x", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
+		}
 
 //		printf("[%08x]", tcrecv->tcm_handle);
 	
@@ -587,16 +604,26 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 
 		//parent
 		__u32 parent = tcrecv->tcm_parent;
-		if (parent == TC_H_ROOT)
-			printf(" root ");
-		else if (parent == TC_H_UNSPEC)
-			printf(" parent none ");
-		else if (TC_H_MAJ(parent) == 0)
-			printf(" parent :%x ", TC_H_MIN(parent));
-		else if (TC_H_MIN(parent) == 0)
-			printf(" parent %x: ", TC_H_MAJ(parent) >> 16);
-		else
-			printf(" parent %x:%x ", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
+		if (parent == TC_H_ROOT) {
+//			printf(" root ");
+			fprintf(dataFile, ", root");
+		}
+		else if (parent == TC_H_UNSPEC) {
+//			printf(" parent none ");
+			fprintf(dataFile, ", none");
+		}
+		else if (TC_H_MAJ(parent) == 0) {
+//			printf(" parent :%x ", TC_H_MIN(parent));
+			fprintf(dataFile, ", :%x", TC_H_MIN(parent));
+		}
+		else if (TC_H_MIN(parent) == 0) {
+//			printf(" parent %x: ", TC_H_MAJ(parent) >> 16);
+			fprintf(dataFile, ", %x:", TC_H_MAJ(parent) >> 16);
+		}
+		else {
+//			printf(" parent %x:%x ", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
+			fprintf(dataFile, ", %x:%x", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
+		}
 
 		if (strcmp("pfifo_fast", RTA_DATA(tb[TCA_KIND])) == 0) {
 			/* get prio qdisc kind */
@@ -604,10 +631,10 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 		} else {
 			/* get tb[TCA_KIND] qdsic kind */
 		}
-
+/*
 		if (tcrecv->tcm_info) // leaf info only for classes, returns 0 for queues. 
 			printf(" leaf %x: ", tcrecv->tcm_info>>16);
-
+*/
 
 		/* Print queue stats */
 		struct rtattr *tbs[TCA_STATS_MAX + 1];
@@ -661,7 +688,8 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 		if (tbs[TCA_STATS_BASIC]) {
 
 			memcpy(&bs, RTA_DATA(tbs[TCA_STATS_BASIC]), MIN(RTA_PAYLOAD(tbs[TCA_STATS_BASIC]), sizeof(bs)));
-			printf("bytes: %llu packets %u", bs.bytes, bs.packets);
+//			printf("bytes: %llu packets %u", bs.bytes, bs.packets);
+			fprintf(dataFile, ", %llu, %u", bs.bytes, bs.packets);
 			
 		}
 
@@ -671,7 +699,8 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** d
 			memcpy(&q, RTA_DATA(tbs[TCA_STATS_QUEUE]), MIN(RTA_PAYLOAD(tbs[TCA_STATS_QUEUE]), sizeof(q)));
 			/* From here we can print all the data in the struct q */
 
-			printf(" qlen: %d drops: %d", q.qlen, q.drops);
+//			printf(" qlen: %d drops: %d", q.qlen, q.drops);
+			fprintf(dataFile, ", %d, %d", q.qlen, q.drops);
 		}
 // DATA to be save to file
 /*

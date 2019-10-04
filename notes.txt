@@ -29,3 +29,10 @@ renzo@Renzo-Ubuntu:~/qdisc_bandwidth$ tc -s qdisc show dev veth1
  qdisc fq_codel 12: parent 1:2 
  qdisc prio 1: parent 100:1 
  qdisc pfifo 11: parent 1:1 
+
+
+csv file format:
+time, dev, qdisc, handle, parent, bytes, packets, qlen, drops
+
+fprintf(dataFile, "writting from nlcomm.c\n");
+
