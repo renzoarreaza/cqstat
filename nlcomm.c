@@ -418,7 +418,7 @@ void nl_print_qdisc_stats(char *buf, int recvlen) {
 }
 
 
-void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index) {
+void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, FILE** dataFile) {
 
 	double time = getMicrotime();
 //	printf("%f\n", time);

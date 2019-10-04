@@ -21,7 +21,6 @@ void usage(void) {
 int main(int argc, char *argv[]) {
 	// parsing arguments
 	char r_type; // 'c' or 'q' (class or queue) statistics
-//	char ints[argc/2][IFNAMSIZ];	// list containing interface names passed as arguments
 	char *ints[argc/2];
 	char file_name[16];
 	int ints_index = 0;
@@ -41,11 +40,12 @@ int main(int argc, char *argv[]) {
 		}
 		argc--; argv++;
 	}
-	if(file_name[0] == '\0') {
-		strcpy(file_name, "stats");
-		// or have a default filename....
-		printf("Using default filename, stats_<int>\n\n");
-	}
+	if(file_name[0] == '\0')
+		strcpy(file_name, "data");
+
+	strcat(file_name, ".csv");
+	printf("filename: %s\n\n", file_name);
+
 	if(ints_index == 0) {
 		printf("Provide interface name\n");
 		usage();
@@ -54,24 +54,44 @@ int main(int argc, char *argv[]) {
 	if (!r_type)
 		r_type = 'c';
 
-	clock_t start_t, end_t; 
-	start_t = clock(); 
+// Opening file for writting
+
+	FILE *fp;
+	fp = fopen(file_name, "w+");
+//   fprintf(fp, "This is testing for fprintf...\n");
+//   fputs("This is testing for fputs...\n", fp);
 
 // Main part
 	/* Open a netlink socket */ 
 	int sock_fd = nl_sock();
-	/* Using nl_print_qdisc_stats as the callback function to parse netlink message */
 	nl_dump_class_qdisc_request(sock_fd, r_type);
-	nl_print_qdisc_stats_new(sock_fd, ints, ints_index); 
-
+	nl_print_qdisc_stats_new(sock_fd, ints, ints_index, &fp); 
 	/* Close netlink socket */ 
 	close(sock_fd);
+	// Close file
+	fclose(fp);
 // end Main part 
-
-	end_t = clock();
-	double total_t = (double)(end_t - start_t)/CLOCKS_PER_SEC;
-	printf("\ntime taken: %f s", total_t);
 
 	printf("\n");
 }  
 
+
+/*
+int myfunction(char* fileName, FILE** readFile) // pointer pointer to allow pointer to be changed 
+{
+    if(( *readFile = fopen(fileName,"r")) == NULL)
+    {
+        return FILE_ERROR;
+    }
+    return FILE_NO_ERROR;
+}
+
+int main(int argc, char **argv)
+{
+    FILE* openReadFile; // This needs to be a pointer. 
+    if(myfunction(argv[1], &openReadFile) != FILE_NO_ERROR) // allow address to be updated 
+    {
+        printf("\n %s : ERROR opening file. \n", __FUNCTION__);
+    }
+}
+*/
