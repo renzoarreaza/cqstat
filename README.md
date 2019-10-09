@@ -1,4 +1,4 @@
-# qdisc_bandwidth
+# cq_bw_measurement
 The purpose of this code is to measure the outgoing bandwidth usage on a per class/qdisc basis. 
 
 
@@ -9,7 +9,6 @@ The iproute2 utility source code was also of great help in using rtnetlink(7).
 This is my first C project, the quality of the code is therefore not great. Feel free to contact me if you find a bug, or suggest improvements.
 
 ## To Do: </br>
-Come up with design!
 
 
 ## Prerequisites
