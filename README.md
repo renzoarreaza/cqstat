@@ -1,5 +1,5 @@
 # CQStat
-The purpose of this code is to measure the outgoing bandwidth usage on a per class/qdisc basis. 
+Tool to measure the outgoing bandwidth usage on a per class/qdisc basis. 
 
 
 ## Notes
