@@ -1,4 +1,4 @@
-# cq_bw_measurement
+# CQ_BW_Measurement
 The purpose of this code is to measure the outgoing bandwidth usage on a per class/qdisc basis. 
 
 
