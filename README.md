@@ -1,16 +1,8 @@
 # CQStat
-Tool to measure the outgoing bandwidth usage on a per class/qdisc basis. 
+Tool to measure the outgoing bandwidth usage on a per class/qdisc basis. </br>
 
 
-## Notes
-This is still a work in progress. 
-
-The basis of this code was taken from https://github.com/sbhTWR/qdisc_stats/
-The iproute2 utility source code was also of great help in using rtnetlink(7).
-
-This is my first C project, the quality of the code is therefore not great. Feel free to contact me if you find a bug, or suggest improvements.
-
-
+This is my first C project, the quality of the code is therefore not great. Feel free to contact me if you find a bug, or suggest improvements. It's still a work in progress and I already have improvements planned.
 
 
 ## Prerequisites
@@ -23,21 +15,24 @@ sudo apt install linux-headers-$(uname -r)
 ## Compile
 Execute the following command in the terminal in the path containing nlcomm.c:
 
-```gcc nlcomm.c qstats.c -o qdisc_stats```
+```gcc nlcomm.c cqstat.c -o cqstat```
 
 This should generate a binary file named qdisc_stats in the current working directory.
 
 ## Execute
 Execute the following command in the terminal in the path containing nlcomm.c:
 
-```./qdisc_stats```
+```./cqstat```
 
-### CLI Options
+The data will be stored in a csv file, either with the provided name or using the default name `cqstat.csv`.
+This data can be plotted using `plotting.py`. This will generate one figure per network interface. 
 
 
 ## To Do / Known issues </br>
-- Doesn't work on virtual machine (Ubuntu 16 and 18 running on OpenStack) </br>
-- Implement ingress bw measurement
+- Implement ingress bw measurement </br>
+- Doesn't work on virtual machine (tested on OpenStack) </br>
+<sub><sup>was tested on ubuntu 16 and 18 running on hardware</sup></sub>
+
 
 ## Final Note
 The basis of this code was taken from https://github.com/sbhTWR/qdisc_stats/
