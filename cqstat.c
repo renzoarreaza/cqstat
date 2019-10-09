@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 		argc--; argv++;
 	}
 	if(file_name[0] == '\0')
-		strcpy(file_name, "data");
+		strcpy(file_name, "cqdata");
 
 	strcat(file_name, ".csv");
 	printf("filename: %s\n\n", file_name);
