@@ -27,6 +27,7 @@ Execute the following command in the terminal in the path containing nlcomm.c:
 The data will be stored in a csv file, either with the provided name or using the default name `cqstat.csv`.
 This data can be plotted using `plotting.py`. This will generate one figure per network interface. 
 
+The `dummy.sh` script can be used to create a virtual interface pair and configure veth1 with a hierarchical queueing setup. This was made purely for testing purposes.
 
 ## To Do / Known issues </br>
 - Class based measurement not working... </br>
