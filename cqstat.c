@@ -14,10 +14,16 @@ void usage(void) {
 	printf("Options:\n\n\
 \t-c,\t\tGet stats per Class\n\
 \t-q,\t\tGet stats per Qdisc\n\
-\t-w [FILE],\t\tProvide file name. Will append interface name to file\n\
+\t-w [FILE],\t\tProvide file name\n\
 \tdev [if_name],\t\tInterface to monitor. Can be used multiple times\n");
 }
 
+
+int run = 1;
+void  INThandler(int sig)
+{
+	run = 0;	
+}
 
 int main(int argc, char *argv[]) {
 	// parsing arguments
@@ -68,7 +74,7 @@ int main(int argc, char *argv[]) {
 // Main part
 	/* Open a netlink socket */ 
 	
-	while(1) {
+	while(run) {
 		int sock_fd = nl_sock();
 		nl_dump_class_qdisc_request(sock_fd, r_type);
 		nl_print_qdisc_stats_new(sock_fd, ints, ints_index, file_name, fp); 

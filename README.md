@@ -29,9 +29,8 @@ This data can be plotted using `plotting.py`. This will generate one figure per 
 
 
 ## To Do / Known issues </br>
+- Class based measurement not working... </br>
 - Implement ingress bw measurement </br>
-- Doesn't work on virtual machine (tested on OpenStack) </br>
-<sub><sup>worked/was tested on ubuntu 16 and 18 running directly on hardware</sup></sub>
 
 
 ## Final Note

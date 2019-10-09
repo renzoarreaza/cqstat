@@ -21,6 +21,7 @@ sudo tc qdisc add dev veth1 parent 1:2 handle 12: fq_codel quantum 300 limit 800
 
 echo "done!" 
 echo "	 
+veth1
 		+------------+
 		|    Root    |
 		+------------+

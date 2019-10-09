@@ -703,33 +703,6 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 			fprintf(dataFile, ", %d, %d", q.qlen, q.drops);
 		}
 // DATA to be save to file
-/*
-		printf("\n------------------------------\n");	
-		if (handle == TC_H_ROOT)
-			printf(" root ");
-		else if (handle == TC_H_UNSPEC)
-			printf(" handle none ");
-		else if (TC_H_MAJ(handle) == 0)
-			printf(" handle :%x ", TC_H_MIN(handle));
-		else if (TC_H_MIN(handle) == 0)
-			printf(" handle %x: ", TC_H_MAJ(handle) >> 16);
-		else
-			printf(" handle %x:%x ", TC_H_MAJ(handle) >> 16, TC_H_MIN(handle));
-		if (parent == TC_H_ROOT)
-			printf(" root ");
-		else if (parent == TC_H_UNSPEC)
-			printf(" parent none ");
-		else if (TC_H_MAJ(parent) == 0)
-			printf(" parent :%x ", TC_H_MIN(parent));
-		else if (TC_H_MIN(parent) == 0)
-			printf(" parent %x: ", TC_H_MAJ(parent) >> 16);
-		else
-			printf(" parent %x:%x ", TC_H_MAJ(parent) >> 16, TC_H_MIN(parent));
-		printf("bytes: %llu packets %u", bs.bytes, bs.packets);
-		printf("%f", time);
-		printf("\n qdisc %s", (const char *)RTA_DATA(tb[TCA_KIND]));
-		printf("\n------------------------------\n");	
-*/
 
 		h = NLMSG_NEXT(h, msglen);
 	}
