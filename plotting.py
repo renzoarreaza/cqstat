@@ -24,18 +24,18 @@ for filename in os.listdir(os.getcwd()):
 		if mtime > mtime_max:
 			mtime_max = mtime
 			datafile = filename
-
+print("processing: " + datafile)
 devs = set()
 data = {}
 time = []
 with open(datafile, 'rU') as f:
-	reader = csv.reader(f)
+	reader = csv.reader(f, skipinitialspace=True)
 	next(reader) #skipping the header for now
 	for row in reader:
 		if len(row) != 9:
 			continue
 		devs.add(row[1])
-		if len(time) == 0 or row[0] != time[-1]:
+		if len(time) == 0 or float(row[0]) != time[-1]:
 			time.append(float(row[0]))
 		id = (row[1], row[4], row[3])
 		try:
@@ -65,7 +65,7 @@ def incr2inst(times, values):	#expects times to be in epoch unix style. converts
 	values = [0] + [value/time for value, time in zip(values, times)]
 	return values
 
-
+os.mkdir(str(os.getcwd()) + "/" + datafile[:-4] + "/")
 for dev in devs:
 	for i in range(4):
 		fig, ax = plt.subplots()
@@ -99,11 +99,11 @@ for dev in devs:
 		# End testing improvements
 		ax.grid()
 		ax.set_axisbelow(True)
-		if len(devs) <= 1:
-			fig.savefig(str(dev) + "_" + str(i) + datafile[:-4] + ".png")
-			fig.savefig(str(dev) + "_" + str(i) + datafile[:-4] + ".pdf")
-		else:
-			fig.savefig("./" + datafile[:-4] + "/" + str(dev) + "_" + str(i) + datafile[:-4] + ".png")
-			fig.savefig("./" + datafile[:-4] + "/" + str(dev) + "_" + str(i) + datafile[:-4] + ".pdf")
+#		if len(devs) <= 1:
+#			fig.savefig(str(dev) + "_" + str(i) + "_" + datafile[:-4] + ".png")
+#			fig.savefig(str(dev) + "_" + str(i) + "_" + datafile[:-4] + ".pdf")
+#		else:
+		fig.savefig("./" + datafile[:-4] + "/" + str(dev) + "_" + str(i) + "_" + datafile[:-4] + ".png")
+		fig.savefig("./" + datafile[:-4] + "/" + str(dev) + "_" + str(i) + "_" + datafile[:-4] + ".pdf")
 
 
