@@ -430,7 +430,7 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 	iovrecv.iov_base = NULL;
 	iovrecv.iov_len = 0;
 
-
+	
 	struct msghdr msg_recv = {
 		.msg_name = &nladdr,
 		.msg_namelen = sizeof(nladdr),
@@ -493,6 +493,7 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 
 	struct tcmsg *tcrecv = NLMSG_DATA(h);
 
+//	printf("msglen: %d", msglen);
 
 	while (NLMSG_OK(h, msglen)) {
 
@@ -554,7 +555,6 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 		}
 
 
-
 //		printf ("\n -------------- \n");
 //		printf("saved index: %d \nreceived index: %d \n", filter_ifindex, tcrecv->tcm_ifindex);
 		
@@ -600,7 +600,6 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 
 //		printf("[%08x]", tcrecv->tcm_handle);
 	
-
 
 		//parent
 		__u32 parent = tcrecv->tcm_parent;

@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
 void usage(void) {
 	printf("Options:\n\n\
 \t-c,\t\tGet stats per Class\n\
@@ -18,7 +17,6 @@ void usage(void) {
 \tdev [if_name],\t\tInterface to monitor. Can be used multiple times\n");
 }
 
-
 int run = 1;
 void  INThandler(int sig)
 {
@@ -26,10 +24,12 @@ void  INThandler(int sig)
 }
 
 int main(int argc, char *argv[]) {
+
 	// parsing arguments
 	char r_type; // 'c' or 'q' (class or queue) statistics
 	char *ints[argc/2];
-	char file_name[16];
+	char base_file_name[16];
+	char file_name[40];
 	int ints_index = 0;
 	while (argc > 0) {
 		if (strcmp(*argv, "dev") == 0) {
@@ -43,14 +43,23 @@ int main(int argc, char *argv[]) {
 			r_type = 'q';
 		} else if(strcmp(*argv, "-w") == 0) {
 			argc--; argv++;
-			strcpy(file_name, *argv);
+			strcpy(base_file_name, *argv);
 		}
 		argc--; argv++;
 	}
-	if(file_name[0] == '\0')
-		strcpy(file_name, "cqdata");
+	if(base_file_name[0] == '\0')
+		strcpy(base_file_name, "cqdata");
 
-	strcat(file_name, ".csv");
+
+	// get system time
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+//	printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1,tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	sprintf(file_name,"%s_%d-%d-%d_%d:%d:%d.csv", base_file_name, tm.tm_year + 1900, tm.tm_mon + 1,tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+	//due to bug with the -c option: override r_type to 'q'
+	r_type = 'q';
+
 	printf("filename: %s\n\n", file_name);
 
 	if(ints_index == 0) {
@@ -66,18 +75,12 @@ int main(int argc, char *argv[]) {
 	FILE *fp;
 	fp = fopen(file_name, "w+");
 	fprintf(fp, "time, dev, qdisc, handle, parent, bytes, packets, qlen, drops");
-//   fprintf(fp, "This is testing for fprintf...\n");
-//   fputs("This is testing for fputs...\n", fp);
-
-//	fprintf(fp, "wrtting from qstats.c, part 1 without\\n");
-//	fprintf(fp, "wrtting from qstats.c, part 2\n");
-// Main part
-	/* Open a netlink socket */ 
 	
 	while(run) {
 		int sock_fd = nl_sock();
 		nl_dump_class_qdisc_request(sock_fd, r_type);
 		nl_print_qdisc_stats_new(sock_fd, ints, ints_index, file_name, fp); 
+//		nl_print_qdisc_stats(
 		close(sock_fd);
 		usleep(5000); //5 miliseconds
 	}
