@@ -65,14 +65,26 @@ def incr2inst(times, values):	#expects times to be in epoch unix style. converts
 	values = [0] + [value/time for value, time in zip(values, times)]
 	return values
 
-os.mkdir(str(os.getcwd()) + "/" + datafile[:-4] + "/")
+def ma(data, n):
+	assert(n < len(data))
+	assert(n > 1)
+	return data[:n-1] + [sum(data[i-(n-1):i+1])/n for i in range(n-1, len(data))]
+
+
+if not os.path.exists(str(os.getcwd()) + "/" + datafile[:-4] + "/"):
+	os.mkdir(str(os.getcwd()) + "/" + datafile[:-4] + "/")
 for dev in devs:
 	for i in range(4):
 		fig, ax = plt.subplots()
 		for id in data:
 			if dev in id:
+				if id[1] == "root" or id[1] == "100:1":
+					continue
 				if i == 0:
-					ax.plot(time,incr2inst(time,data[id][i][:mini]),label=str(id))
+					data_1 = incr2inst(time,data[id][i][:mini])
+					data_2 = [x*8 for x in data_1]  # in bits/s
+					data_3 = ma(data_2, 10)
+					ax.plot(time,data_3,label=str(id), alpha=0.7)  
 				if i == 1:
 					ax.plot(time,incr2inst(time,data[id][i][:mini]),label=str(id))
 				if i == 2:
@@ -82,7 +94,7 @@ for dev in devs:
 
 #time, dev, qdisc, handle, parent, bytes, packets, qlen, drops
 		if i == 0:
-			ax.set(xlabel='time', ylabel='Bandwidth (bytes/s)')
+			ax.set(xlabel='time', ylabel='Bandwidth (bits/s)')
 			plt.title("Bandwidth", y=1.02)
 		if i == 1:
 			ax.set(xlabel='time', ylabel='Rate (packet/s)')
