@@ -30,8 +30,8 @@ This data can be plotted using `plotting.py`. This will generate one figure per 
 The `dummy.sh` script can be used to create a virtual interface pair and configure veth1 with a hierarchical queueing setup. This was made purely for testing purposes.
 
 ## To Do / Known issues </br>
-- change plots to bit/s </br>
 - Improve plotting </br>
+- upload example plot </br>
 - Class based measurement not working... -c/-q flag is being ignored. always set to -q internally </br>
 - Implement ingress bw measurement </br>
 
