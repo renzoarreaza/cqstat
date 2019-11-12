@@ -699,7 +699,7 @@ void nl_print_qdisc_stats_new(int sock_fd, char **ints, int ints_index, char* fi
 			/* From here we can print all the data in the struct q */
 
 //			printf(" qlen: %d drops: %d", q.qlen, q.drops);
-			fprintf(dataFile, ", %d, %d", q.qlen, q.drops);
+			fprintf(dataFile, ", %d, %d, %d", q.qlen, q.backlog, q.drops);
 		}
 // DATA to be save to file
 

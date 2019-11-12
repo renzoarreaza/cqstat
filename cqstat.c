@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 	FILE *fp;
 	fp = fopen(file_name, "w+");
-	fprintf(fp, "time, dev, qdisc, handle, parent, bytes, packets, qlen, drops");
+	fprintf(fp, "time, dev, qdisc, handle, parent, bytes, packets, qlen, backlog, drops");
 	
 	while(run) {
 		int sock_fd = nl_sock();

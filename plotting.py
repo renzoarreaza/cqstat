@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.font_manager import FontProperties
 
+# added backlog as second to last
 ## example data
 #time, dev, qdisc, handle, parent, bytes, packets, qlen, drops
 #1570217724.221082, wlp3s0, mq, none, root, 107843, 935, 0, 0
@@ -32,7 +33,7 @@ with open(datafile, 'rU') as f:
 	reader = csv.reader(f, skipinitialspace=True)
 	next(reader) #skipping the header for now
 	for row in reader:
-		if len(row) != 9:
+		if len(row) != 10:
 			continue
 		devs.add(row[1])
 		if len(time) == 0 or float(row[0]) != time[-1]:
@@ -43,12 +44,14 @@ with open(datafile, 'rU') as f:
 			data[id][1].append(int(row[6]))
 			data[id][2].append(int(row[7]))
 			data[id][3].append(int(row[8]))
+			data[id][4].append(int(row[9]))
 		except (KeyError, IndexError):
-			data[id] = [[],[],[],[]]
+			data[id] = [[],[],[],[],[]]
 			data[id][0].append(int(row[5]))
 			data[id][1].append(int(row[6]))
 			data[id][2].append(int(row[7]))
 			data[id][3].append(int(row[8]))
+			data[id][4].append(int(row[9]))
 
 lens = []
 for key in data:
@@ -74,11 +77,11 @@ def ma(data, n):
 if not os.path.exists(str(os.getcwd()) + "/" + datafile[:-4] + "/"):
 	os.mkdir(str(os.getcwd()) + "/" + datafile[:-4] + "/")
 for dev in devs:
-	for i in range(4):
+	for i in range(5):
 		fig, ax = plt.subplots()
 		for id in data:
 			if dev in id:
-				if id[1] == "root" or id[1] == "100:1":
+				if id[1] == "root":  # or id[1] == "100:1":
 					continue
 				if i == 0:
 					data_1 = incr2inst(time,data[id][i][:mini])
@@ -87,10 +90,12 @@ for dev in devs:
 					ax.plot(time,data_3,label=str(id), alpha=0.7)  
 				if i == 1:
 					ax.plot(time,incr2inst(time,data[id][i][:mini]),label=str(id))
-				if i == 2:
+				if i in [2,3,4]:
 					ax.plot(time,data[id][i][:mini],label=str(id))
-				if i == 3:
-					ax.plot(time,data[id][i][:mini],label=str(id))
+					if i == 3:
+						q_byte = data[id][i][:mini]
+						print("max queue byte: " + str(max(q_byte)))
+						print("avg queue byte: " + str(sum(q_byte)/len(q_byte)))
 
 #time, dev, qdisc, handle, parent, bytes, packets, qlen, drops
 		if i == 0:
@@ -103,6 +108,9 @@ for dev in devs:
 			ax.set(xlabel='time', ylabel='Queue length (packets)')
 			plt.title("Queue Length", y=1.02)
 		if i == 3:
+			ax.set(xlabel='time', ylabel='Queue length (bytes)')
+			plt.title("Queue Length", y=1.02)
+		if i == 4:
 			ax.set(xlabel='time', ylabel='Drops (packets?)')
 			plt.title("Packet drops", y=1.02)
 
