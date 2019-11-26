@@ -32,7 +32,8 @@ The `dummy.sh` script can be used to create a virtual interface pair and configu
 ## To Do / Known issues </br>
 - Improve plotting </br>
 - upload example plot </br>
-- Class based measurement not working... -c/-q flag is being ignored. always set to -q internally </br>
+- Class based measurement not working... 
+    - Current workaround: -c/-q flag is being ignored. Internally always being set to -q </br>
 - Implement ingress bw measurement </br>
 
 
